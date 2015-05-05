@@ -1,0 +1,23 @@
+-- removes a key from a JSON:
+CREATE OR REPLACE FUNCTION json_dropkey (obja json, key text) RETURNS json as $$
+delete obja[key];
+return obja;
+$$ LANGUAGE plv8 IMMUTABLE STRICT;
+
+-- according operator:
+ create operator - (leftarg= json, rightarg=text,procedure=json_dropkey,commutator=-);
+
+-- Usage: 
+select json_dropkey( '{"a":20, "c":"A test" }'::json,'c') ;
+ json_dropkey
+--------------
+ {"a":20}
+(1 row)
+
+select '{"a":20, "c":"A test" }'::json - 'c';
+ ?column?
+----------
+ {"a":20}
+(1 row)
+
+update users set other = other - 'myspace_account';
